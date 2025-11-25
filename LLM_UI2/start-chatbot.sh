@@ -1,0 +1,6 @@
+#!/bin/bash
+
+export JINA_API_KEY=jina_348be976923940cca1dceb46908edec8GeO5kv5TmExRAQ3GVUL2wLK58pN7
+export OPENAI_API_KEY=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
+
+python -m streamlit run --server.port 8080 streamlit_app_cloud.py

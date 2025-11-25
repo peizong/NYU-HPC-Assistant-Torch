@@ -3,7 +3,7 @@ import logging
 import requests
 from xml.etree import ElementTree
 import streamlit as st
-from core.faisembedder import FaissEmbedder
+#from core.faisembedder import FaissEmbedder
 import json
 import pandas as pd
 import faiss
@@ -12,6 +12,11 @@ import numpy as np
 from openai import OpenAI
 from portkey_ai import PORTKEY_GATEWAY_URL, createHeaders #pei
 import time
+
+# Avoid issues related to faiss======
+import sys
+sys.modules['faiss.swigfaiss_avx2'] = faiss
+sys.modules['faiss.swigfaiss_avx512'] = faiss
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -27,11 +32,11 @@ RESULTS_COUNT = 4
 MAX_CHAT_HISTORY = 6
 
 # Resource Configuration
-RESOURCES_DIR_NAME = "resources"
+RESOURCES_DIR_NAME = "resources-torch"
 RAG_DATA_FILE = "rag_prepared_data_nyu_hpc.csv"
 FAISS_INDEX_FILE = "faiss_index.pkl"
 #S3_RESOURCES_URL = "https://nyu-hpc-llm.s3.us-east-1.amazonaws.com/resources/"
-S3_RESOURCES_URL = "https://nyuhpc-chatbot.s3.us-east-2.amazonaws.com/resources/"
+S3_RESOURCES_URL = "https://nyuhpc-chatbot.s3.us-east-2.amazonaws.com/resources-torch/"
 
 class JinaEmbedder:
     """Handles embeddings using Jina API"""
@@ -54,19 +59,28 @@ class JinaEmbedder:
 class FaissEmbedder:
     def __init__(self, rag_output, index_file=None):
         self.df = pd.read_csv(rag_output)
-        self.embedder = JinaEmbedder(os.getenv("JINA_API_KEY"))
+        JINA_API_KEY="jina_348be976923940cca1dceb46908edec8GeO5kv5TmExRAQ3GVUL2wLK58pN7"
+        self.embedder = JinaEmbedder(JINA_API_KEY) #os.getenv("JINA_API_KEY"))
         #self.openai_client = OpenAI()
         # #changed by Pei#######################
+        # self.openai_client = OpenAI(
+        #     #api_key="OPENAI_API_KEY", # defaults to os.environ.get("OPENAI_API_KEY")
+        #     base_url="https://ai-gateway.apps.cloud.rt.nyu.edu/v1/", #PORTKEY_GATEWAY_URL,
+        #     default_headers=createHeaders(
+        #     provider="openai",
+        #     api_key= os.environ.get("PORTKEY_API_KEY"), #"PORTKEY_API_KEY", # defaults to os.environ.get("PORTKEY_API_KEY"),
+        #     virtual_key= os.environ.get("VIRTUAL_KEY_VALUE") #if you want provider key on gateway instead of client
+        #                                   )
+        # )
         self.openai_client = OpenAI(
-            api_key="xxx", # defaults to os.environ.get("OPENAI_API_KEY")
+            api_key="xxx", #"OPENAI_API_KEY", # defaults to os.environ.get("OPENAI_API_KEY")
             base_url="https://ai-gateway.apps.cloud.rt.nyu.edu/v1", #PORTKEY_GATEWAY_URL,
             default_headers=createHeaders(
-            provider="openai",
-            api_key= os.environ.get("PORTKEY_API_KEY"), #"PORTKEY_API_KEY", # defaults to os.environ.get("PORTKEY_API_KEY"),
-            virtual_key= os.environ.get("VIRTUAL_KEY_VALUE") #if you want provider key on gateway instead of client
+            #provider="openai",
+            api_key= "8gTMTBfxZ9zzXHp/ZTcbUhPo9+81", #os.environ.get("PORTKEY_API_KEY"), #"PORTKEY_API_KEY", # defaults to os.environ.get("PORTKEY_API_KEY"),
+            virtual_key= "openai-nyu-it-d-5b382a" #os.environ.get("VIRTUAL_KEY_VALUE") #if you want provider key on gateway instead of client
                                           )
         )
-        
         # #changed by Pei#######################
         
         # Initialize index
@@ -236,7 +250,7 @@ Always ensure your responses are accurate and aligned with NYU's HPC environment
             stream = st.session_state.embedder.openai_client.chat.completions.create(
                 model=MODEL_NAME,
                 messages=messages,
-                stream=True, #changed by pei
+                #stream=True, #changed by pei
             )
             
             #Danyl's original code

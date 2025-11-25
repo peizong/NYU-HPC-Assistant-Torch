@@ -11,7 +11,7 @@ CHAT_PLACEHOLDER = "What would you like to know about NYU's HPC?"
 RESULTS_COUNT = 4  # Number of similar documents to retrieve
 MAX_CHAT_HISTORY = 6  # Number of recent messages to include in context
 
-RESOURCES_FOLDER = "resources"
+RESOURCES_FOLDER = "resources-torch"
 RAG_DATA_FILE = "rag_prepared_data_nyu_hpc.csv"
 FAISS_INDEX_FILE = "faiss_index.pkl"
 
