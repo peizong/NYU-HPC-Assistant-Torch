@@ -147,11 +147,11 @@ clean steps to set up Red Hat OpenShift
   
   streamlit run --server.port ${APP_PORT} streamlit_app_cloud.py
 
-  1 open https://console.cloud.rt.nyu.edu/, choose “developer” view, choose “Import from Git”
+  1 open https://console.cloud.rt.nyu.edu/, choose “developer” view, choose “Import from Git” [from “Git Repo” NOT “Serverless function"]
   
   2 Git Repo URL: https://github.com/peizong/xxx.git
   
-  3 Show advanced Git options/Context dir: LLM_UI
+  3 Show advanced Git options/Context dir: LLM_UI (for the Python version, I used the default Python 3.12 (UBI 8))
   
   4 General/name: hpc-chatbot3 -> chatbot
   
@@ -172,4 +172,7 @@ clean steps to set up Red Hat OpenShift
 possible reasons for issues: 
 (1) missing three parameter in a faiss function: numpy version, faiss version, force install faiss, 
 (2) no output: API KEY, the different output of port key and open AI key;
-(3) when building  is slow, add cpus and memory
+(3) when building  is slow, add cpus and memory (choose Actions/Resource to request CPUs/Memory for building  or add the following line in the YAML file, resources part)
+    requests:
+      cpu: 2
+      memory: 40Gi
