@@ -8,7 +8,7 @@ import pickle
 import faiss
 import os.path
 from openai import OpenAI
-from portkey_ai import PORTKEY_GATEWAY_URL, createHeaders #pei
+from portkey_ai import PORTKEY_GATEWAY_URL, createHeaders, Portkey #pei
 
 # Avoid issues related to faiss======
 import sys
@@ -17,7 +17,7 @@ sys.modules['faiss.swigfaiss_avx512'] = faiss
 
 # Configuration Constants
 DEFAULT_EMBEDDING_MODEL = "jinaai/jina-embeddings-v3"
-DEFAULT_LLM_MODEL = "gpt-4o-mini" # THIS IS NOT THE MODEL USED IN THE STREAMLIT APP
+DEFAULT_LLM_MODEL = "@gpt-4o-mini/gpt-4o-mini" # THIS IS NOT THE MODEL USED IN THE STREAMLIT APP
 DEFAULT_INDEX_FILE = "faiss_index.pkl"
 DEFAULT_CHECKPOINT_SUFFIX = "embedding_checkpoint.json"
 DEFAULT_SEARCH_RESULTS = 5
@@ -41,14 +41,18 @@ class FaissEmbedder:
         self.model = SentenceTransformer(DEFAULT_EMBEDDING_MODEL, trust_remote_code=True)
         self.dimension = self.model.get_sentence_embedding_dimension()
         #self.openai_client = OpenAI() # original
-        self.openai_client = OpenAI(
-            api_key="xxx", #"OPENAI_API_KEY", # defaults to os.environ.get("OPENAI_API_KEY")
-            base_url="https://ai-gateway.apps.cloud.rt.nyu.edu/v1", #PORTKEY_GATEWAY_URL,
-            default_headers=createHeaders(
-            #provider="openai",
-            api_key= "8gTMTBfxZ9zzXHp/ZTcbUhPo9+81", #os.environ.get("PORTKEY_API_KEY"), #"PORTKEY_API_KEY", # defaults to os.environ.get("PORTKEY_API_KEY"),
-            virtual_key= "openai-nyu-it-d-5b382a" #os.environ.get("VIRTUAL_KEY_VALUE") #if you want provider key on gateway instead of client
-                                          )
+        #self.openai_client = OpenAI(
+        #    api_key="xxx", #"OPENAI_API_KEY", # defaults to os.environ.get("OPENAI_API_KEY")
+        #    base_url="https://ai-gateway.apps.cloud.rt.nyu.edu/v1", #PORTKEY_GATEWAY_URL,
+        #    default_headers=createHeaders(
+        #    #provider="openai",
+        #    api_key= "8gTMTBfxZ9zzXHp/ZTcbUhPo9+81", #os.environ.get("PORTKEY_API_KEY"), #"PORTKEY_API_KEY", # defaults to os.environ.get("PORTKEY_API_KEY"),
+        #    virtual_key= "openai-nyu-it-d-5b382a" #os.environ.get("VIRTUAL_KEY_VALUE") #if you want provider key on gateway instead of client
+        #                                  )
+        #)
+        self.openai_client = Portkey(
+            base_url = "https://ai-gateway.apps.cloud.rt.nyu.edu/v1",
+            api_key = "H5CASawqNSqQFHctCy7NgNrOCp2n",
         )
 
         
